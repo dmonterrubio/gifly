@@ -2,25 +2,45 @@ import { useState, useEffect, useContext } from 'react'
 import GifsContext from '../context/GifsContext'
 import getGifs from '../services/getGifs'
 
-export const useGifs = ({keyword} = {keyword: null} ) => {
+const INITIAL_PAGE = 0
+
+const useGifs = ({keyword} = {keyword: null} ) => {
 
     const [loading , setLoading] = useState(false)
-    const {gifs, setGifs} = useContext(GifsContext)
+    const [nextPageLoading, setNextPageLoading] = useState(false)
+    const [page, setPage] =  useState(INITIAL_PAGE)
 
-    //const [gifs , setGifs] = useState([])
+    const {gifs, setGifs} = useContext(GifsContext)
+ 
+    // Recuperamos la keyword del localstorage
+    const keywordToUse = keyword || localStorage.getItem('lastKeyword') || 'random'
 
     useEffect(() => {
+
         setLoading(true)
-        // Recuperamos la keyword del localstorage
-        const keywordToUse = keyword || localStorage.getItem('lastKeyword') || 'random'
         getGifs({keyword:keywordToUse})
-        .then(gifs => {
-            setGifs(gifs) 
-            setLoading(false)
-            localStorage.setItem('lastKeyword',keyword)
-        })
-    },[keyword, setGifs])
+            .then(gifs => {
+                setGifs(gifs) 
+                setLoading(false)
+                localStorage.setItem('lastKeyword',keyword)
+            })
+        },[keywordToUse,keyword, setGifs])
 
-    return {gifs, loading}
+    useEffect(() => {
 
+        if(page === INITIAL_PAGE) return
+
+        setNextPageLoading(true)
+        getGifs({keyword:keywordToUse, page})
+            .then(nextGifs => {
+                setGifs(prevGifs => prevGifs.concat(nextGifs))
+                setNextPageLoading(false)
+            }
+            )
+    },[keywordToUse, page, setGifs])
+
+
+    return { loading, nextPageLoading, gifs, setPage }
 }
+
+export default useGifs

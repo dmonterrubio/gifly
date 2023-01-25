@@ -1,9 +1,9 @@
 import React from 'react'
-import './App.css'
-import Home from './pages/Home';
-import SearchResults from './pages/SearchResult';
-import Detail from './pages/Detail';
-import StaticContext from './context/StaticContext';
+import 'App.css'
+import Home from 'pages/Home';
+import SearchResults from 'pages/SearchResult';
+import Detail from 'pages/Detail';
+import StaticContext from 'context/StaticContext';
 import { Route , Link} from "wouter";
 import { GifsContextProvider} from './context/GifsContext'
 
